@@ -1,0 +1,142 @@
+swagger: "2.0"
+info:
+  description: API for proxy service
+  version: "1.0.0"
+  title: Simple proxy
+host: localhost:8885
+schemes:
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
+
+paths:
+  /__settings:
+    get:
+      tags:
+        - Settings
+      summary: returns current proxy settings
+      responses:
+        200:
+          description: Returns current settings
+          schema:
+            $ref: '#/definitions/SettingsParams'
+    post:
+      tags:
+        - Settings
+      summary: updates proxy settings
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            required:
+              - omUrl
+              - lcUrl
+              - customer_id
+              - customer_id_for_history
+            properties:
+              omUrl:
+                type: string
+                example: "http://service.com"
+                x-nullable: false
+              lcUrl:
+                type: string
+                example: "http://service.com"
+                x-nullable: false
+              customer_id:
+                type: integer
+                example: 1234567890
+                x-nullable: false
+              customer_id_for_history:
+                type: integer
+                example: 1234567890
+                x-nullable: false
+      responses:
+        200:
+          description: Returns updated settings
+          schema:
+            $ref: '#/definitions/UpdateSettings'
+        400:
+          description: Invalid request parameters
+          schema:
+            $ref: '#/definitions/Error'
+
+  /update_customer_id:
+    post:
+      tags:
+        - Scripts
+      summary: сhanging the customer_id for history (lc)
+      parameters:
+        - name: body
+          in: body
+          schema:
+            type: object
+            required:
+              - customer_id_for_history
+            properties:
+              customer_id_for_history:
+                type: integer
+                example: 1234567890
+                x-nullable: false
+      responses:
+        200:
+          description: Success response
+          schema:
+            $ref: '#/definitions/UpdateCustomerID'
+        400:
+          description: Invalid request parameters
+          schema:
+            $ref: '#/definitions/Error'
+
+definitions:
+  UpdateSettings:
+    type: object
+    properties:
+      message:
+        type: string
+        example: Settings were successfully updated
+      params:
+        type: object
+        $ref: "#/definitions/SettingsParams"
+
+  SettingsParams:
+    type: object
+    properties:
+      omUrl:
+        type: string
+        example: "http://service.com"
+      lcUrl:
+        type: string
+        example: "http://service.com"
+      Customer ID to replace (orders):
+        type: integer
+        example: 1234567890
+      Customer ID to replace (history):
+        type: integer
+        example: 1234567890
+
+  Error:
+    type: object
+    properties:
+      message:
+        type: string
+        example: Settings not updated
+      error:
+        type: string
+        example: Error text
+
+  UpdateCustomerID:
+    type: object
+    properties:
+      message:
+        type: string
+        example: Customer ID for history was successfully updated
+      param:
+        type: object
+        properties:
+          customer_id_for_history:
+            type: integer
+            example: 1234567890
